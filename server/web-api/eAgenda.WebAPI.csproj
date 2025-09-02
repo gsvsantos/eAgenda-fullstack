@@ -16,11 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\core\aplicacao\eAgenda.Core.Aplicacao.csproj" />
     <ProjectReference Include="..\infraestrutura\orm\eAgenda.Infraestrutura.ORM.csproj" />
   </ItemGroup>
