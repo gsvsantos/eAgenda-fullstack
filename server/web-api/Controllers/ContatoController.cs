@@ -1,6 +1,5 @@
-using eAgenda.Core.Aplicacao.ModuloContato.Cadastrar;
-using eAgenda.Core.Dominio.ModuloContato;
-using eAgenda.WebAPI.Models.ModuloContato.Cadastrar;
+using eAgenda.Core.Aplicacao.ModuloContato.Commands;
+using eAgenda.WebAPI.Models.ModuloContato;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -9,24 +8,10 @@ namespace eAgenda.WebAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ContatoController : ControllerBase
+public class ContatoController(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator mediator;
-    private readonly IRepositorioContato repositorioContato;
-    private readonly ILogger<ContatoController> logger;
-
-    public ContatoController(
-        IMediator mediator,
-        IRepositorioContato repositorioContato,
-        ILogger<ContatoController> logger)
-    {
-        this.mediator = mediator;
-        this.repositorioContato = repositorioContato;
-        this.logger = logger;
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Cadastrar(CadastrarContatoRequest request)
+    [HttpPost("cadastrar")]
+    public async Task<ActionResult<CadastrarContatoResponse>> Cadastrar(CadastrarContatoRequest request)
     {
         CadastrarContatoCommand command = new(
             request.Nome,
@@ -46,19 +31,89 @@ public class ContatoController : ControllerBase
         return Created(string.Empty, response);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> SelecionarTodos()
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<EditarContatoResponse>> Editar(Guid id, EditarContatoRequest request)
     {
-        List<Contato> contatosSelecionados = await repositorioContato.SelecionarRegistrosAsync();
+        EditarContatoCommand command = new(
+            id,
+            request.NovoNome,
+            request.NovoTelefone,
+            request.NovoEmail,
+            request.NovaEmpresa,
+            request.NovoCargo
+        );
 
-        return Ok(contatosSelecionados);
+        Result<EditarContatoResult> result = await mediator.Send(command);
+
+        if (result.IsFailed)
+            return BadRequest(result.Errors[0]);
+
+        EditarContatoResponse response = new(
+            result.Value.ConseguiuEditar,
+            result.Value.NovoNome,
+            result.Value.NovoTelefone,
+            result.Value.NovoEmail,
+            result.Value.NovaEmpresa,
+            result.Value.NovoCargo
+        );
+
+        return Ok(response);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> SelecionarPorId(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ExcluirContatoResponse>> Excluir(Guid id)
     {
-        Contato? contatoSelecionado = await repositorioContato.SelecionarRegistroPorIdAsync(id);
+        ExcluirContatoCommand command = new(
+            id
+        );
 
-        return Ok(contatoSelecionado);
+        Result<ExcluirContatoResult> result = await mediator.Send(command);
+
+        if (result.IsFailed)
+            return BadRequest(result.Errors[0]);
+
+        return NoContent();
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<SelecionarContatosResponse>> SelecionarTodos([FromQuery] SelecionarContatosRequest request)
+    {
+        SelecionarContatosQuery query = new(request.Quantidade);
+
+        Result<SelecionarContatosResult> result = await mediator.Send(query);
+
+        if (result.IsFailed)
+            return BadRequest();
+
+        SelecionarContatosResponse response = new(
+             result.Value.Contatos.Count,
+             result.Value.Contatos
+            );
+
+        return Ok(response);
+    }
+
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<SelecionarContatoPorIdResponse>> SelecionarPorId(Guid id)
+    {
+        SelecionarContatoPorIdQuery query = new(id);
+
+        Result<SelecionarContatoPorIdResult> result = await mediator.Send(query);
+
+        if (result.IsFailed)
+            return BadRequest(result.Errors[0].Message);
+
+        SelecionarContatoPorIdResponse response = new(
+            result.Value.Id,
+            result.Value.Nome,
+            result.Value.Telefone,
+            result.Value.Email,
+            result.Value.Empresa,
+            result.Value.Cargo,
+            result.Value.Compromissos
+        );
+
+        return Ok(response);
     }
 }

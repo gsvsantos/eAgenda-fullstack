@@ -1,4 +1,4 @@
-namespace eAgenda.WebAPI.Models.ModuloContato.Cadastrar;
+namespace eAgenda.WebAPI.Models.ModuloContato;
 
 public record CadastrarContatoRequest(
     string Nome,
@@ -7,3 +7,5 @@ public record CadastrarContatoRequest(
     string? Empresa,
     string? Cargo
 );
+
+public record CadastrarContatoResponse(Guid Id);
