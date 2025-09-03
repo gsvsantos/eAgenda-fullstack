@@ -1,3 +1,4 @@
+using AutoMapper;
 using eAgenda.Core.Aplicacao.Compartilhado;
 using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using eAgenda.Core.Dominio.Compartilhado;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace eAgenda.Core.Aplicacao.ModuloContato.Handlers;
 
 public class CadastrarContatoCommandHandler(
+    IMapper mapper,
     IRepositorioContato repositorioContato,
     IUnitOfWork unitOfWork,
     ILogger<CadastrarContatoCommandHandler> logger
@@ -24,19 +26,13 @@ public class CadastrarContatoCommandHandler(
 
         try
         {
-            Contato contato = new(
-                command.Nome,
-                command.Telefone,
-                command.Email,
-                command.Empresa,
-                command.Cargo
-            );
+            Contato novoContato = mapper.Map<Contato>(command);
 
-            await repositorioContato.CadastrarRegistroAsync(contato);
+            await repositorioContato.CadastrarRegistroAsync(novoContato);
 
             await unitOfWork.CommitAsync();
 
-            CadastrarContatoResult result = new(contato.Id);
+            CadastrarContatoResult result = mapper.Map<CadastrarContatoResult>(novoContato);
 
             return Result.Ok(result);
         }

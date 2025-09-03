@@ -15,14 +15,21 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
+        Assembly assembly = typeof(DependencyInjection).Assembly;
+
         services.AddSerilogConfig(logging, configuration);
 
         services.AddMediatR(config =>
         {
-            Assembly assembly = typeof(DependencyInjection).Assembly;
-
             config.RegisterServicesFromAssembly(assembly);
         });
+
+        services.AddAutoMapper(config =>
+        {
+            string? licenseKey = configuration["AUTOMAPPER_LICENSE_KEY"];
+
+            config.LicenseKey = licenseKey;
+        }, assembly);
 
         return services;
     }

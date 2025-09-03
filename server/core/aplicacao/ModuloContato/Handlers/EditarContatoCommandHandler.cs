@@ -1,3 +1,4 @@
+using AutoMapper;
 using eAgenda.Core.Aplicacao.Compartilhado;
 using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using eAgenda.Core.Dominio.Compartilhado;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace eAgenda.Core.Aplicacao.ModuloContato.Handlers;
 
 public class EditarContatoCommandHandler(
+    IMapper mapper,
     IRepositorioContato repositorioContato,
     IUnitOfWork unitOfWork,
     ILogger<EditarContatoCommandHandler> logger
@@ -23,41 +25,29 @@ public class EditarContatoCommandHandler(
         if (contatoSelecionado is null)
             return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(command.Id));
 
-        if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Email.Equals(command.NovoEmail))
-            && contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Telefone.Equals(command.NovoTelefone)))
+        if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Email.Equals(command.Email))
+            && contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Telefone.Equals(command.Telefone)))
         {
             return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail e Telefone já cadastrados."));
         }
-        else if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Email.Equals(command.NovoEmail)))
+        else if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Email.Equals(command.Email)))
         {
             return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail já cadastrados."));
         }
-        else if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Telefone.Equals(command.NovoTelefone)))
+        else if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Telefone.Equals(command.Telefone)))
         {
             return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Telefone já cadastrados."));
         }
 
         try
         {
-            Contato contatoEditado = new(
-                command.NovoNome,
-                command.NovoTelefone,
-                command.NovoEmail,
-                command.NovaEmpresa,
-                command.NovoCargo
-            );
+            Contato contatoEditado = mapper.Map<Contato>(command);
 
             await repositorioContato.EditarRegistroAsync(contatoSelecionado.Id, contatoEditado);
 
             await unitOfWork.CommitAsync();
 
-            EditarContatoResult result = new(
-                contatoEditado.Nome,
-                contatoEditado.Telefone,
-                contatoEditado.Email,
-                contatoEditado.Empresa,
-                contatoEditado.Cargo
-            );
+            EditarContatoResult result = mapper.Map<EditarContatoResult>(contatoEditado);
 
             return Result.Ok(result);
         }

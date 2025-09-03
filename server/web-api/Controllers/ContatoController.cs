@@ -36,11 +36,11 @@ public class ContatoController(IMediator mediator) : ControllerBase
     {
         EditarContatoCommand command = new(
             id,
-            request.NovoNome,
-            request.NovoTelefone,
-            request.NovoEmail,
-            request.NovaEmpresa,
-            request.NovoCargo
+            request.Nome,
+            request.Telefone,
+            request.Email,
+            request.Empresa,
+            request.Cargo
         );
 
         Result<EditarContatoResult> result = await mediator.Send(command);
@@ -49,12 +49,11 @@ public class ContatoController(IMediator mediator) : ControllerBase
             return BadRequest(result.Errors[0]);
 
         EditarContatoResponse response = new(
-            result.Value.ConseguiuEditar,
-            result.Value.NovoNome,
-            result.Value.NovoTelefone,
-            result.Value.NovoEmail,
-            result.Value.NovaEmpresa,
-            result.Value.NovoCargo
+            result.Value.Nome,
+            result.Value.Telefone,
+            result.Value.Email,
+            result.Value.Empresa,
+            result.Value.Cargo
         );
 
         return Ok(response);

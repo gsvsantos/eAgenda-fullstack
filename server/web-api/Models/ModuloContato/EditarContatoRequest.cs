@@ -1,17 +1,17 @@
 namespace eAgenda.WebAPI.Models.ModuloContato;
 
 public record EditarContatoRequest(
-    string NovoNome,
-    string NovoTelefone,
-    string NovoEmail,
-    string? NovaEmpresa,
-    string? NovoCargo
+    string Nome,
+    string Telefone,
+    string Email,
+    string? Empresa,
+    string? Cargo
 );
 
 public record EditarContatoResponse(
-    string NovoNome,
-    string NovoTelefone,
-    string NovoEmail,
-    string? NovaEmpresa,
-    string? NovoCargo
+    string Nome,
+    string Telefone,
+    string Email,
+    string? Empresa,
+    string? Cargo
 );
