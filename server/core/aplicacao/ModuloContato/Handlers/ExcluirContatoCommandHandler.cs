@@ -26,7 +26,7 @@ public class ExcluirContatoCommandHandler
         if (contatoSelecionado is null)
             return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(command.Id));
 
-        if (compromissosExistentes.Any(c => c.Contato!.Id.Equals(contatoSelecionado.Id)))
+        if (compromissosExistentes.Any(c => c.Contato != null! && c.Contato!.Id.Equals(contatoSelecionado.Id)))
             return Result.Fail(ResultadosErro.ExclusaoBloqueadaErro("Não é possível excluir este contato, pois há compromissos vinculados a ele."));
 
         try

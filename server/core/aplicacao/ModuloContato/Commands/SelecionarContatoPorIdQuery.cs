@@ -19,7 +19,7 @@ public record SelecionarContatoPorIdResult(
 
 public record DetalhesCompromissoContatoDto(
     string Assunto,
-    DateTime Data,
+    DateTime DataOcorrencia,
     TimeSpan HoraInicio,
     TimeSpan HoraTermino,
     TipoCompromisso TipoCompromisso,

@@ -1,3 +1,4 @@
+using AutoMapper;
 using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using eAgenda.WebAPI.Models.ModuloContato;
 using FluentResults;
@@ -8,25 +9,22 @@ namespace eAgenda.WebAPI.Controllers;
 
 [ApiController]
 [Route("contatos")]
-public class ContatoController(IMediator mediator) : ControllerBase
+public class ContatoController(
+    IMapper mapper,
+    IMediator mediator
+) : ControllerBase
 {
-    [HttpPost("cadastrar")]
+    [HttpPost]
     public async Task<ActionResult<CadastrarContatoResponse>> Cadastrar(CadastrarContatoRequest request)
     {
-        CadastrarContatoCommand command = new(
-            request.Nome,
-            request.Telefone,
-            request.Email,
-            request.Empresa,
-            request.Cargo
-        );
+        CadastrarContatoCommand command = mapper.Map<CadastrarContatoCommand>(request);
 
         Result<CadastrarContatoResult> result = await mediator.Send(command);
 
         if (result.IsFailed)
             return BadRequest(result.Errors[0]);
 
-        CadastrarContatoResponse response = new(result.Value.Id);
+        CadastrarContatoResponse response = mapper.Map<CadastrarContatoResponse>(result.Value);
 
         return Created(string.Empty, response);
     }
@@ -34,27 +32,14 @@ public class ContatoController(IMediator mediator) : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<EditarContatoResponse>> Editar(Guid id, EditarContatoRequest request)
     {
-        EditarContatoCommand command = new(
-            id,
-            request.Nome,
-            request.Telefone,
-            request.Email,
-            request.Empresa,
-            request.Cargo
-        );
+        EditarContatoCommand command = mapper.Map<(Guid, EditarContatoRequest), EditarContatoCommand>((id, request));
 
         Result<EditarContatoResult> result = await mediator.Send(command);
 
         if (result.IsFailed)
             return BadRequest(result.Errors[0]);
 
-        EditarContatoResponse response = new(
-            result.Value.Nome,
-            result.Value.Telefone,
-            result.Value.Email,
-            result.Value.Empresa,
-            result.Value.Cargo
-        );
+        EditarContatoResponse response = mapper.Map<EditarContatoResponse>(result.Value);
 
         return Ok(response);
     }
@@ -62,9 +47,7 @@ public class ContatoController(IMediator mediator) : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ExcluirContatoResponse>> Excluir(Guid id)
     {
-        ExcluirContatoCommand command = new(
-            id
-        );
+        ExcluirContatoCommand command = mapper.Map<ExcluirContatoCommand>(id);
 
         Result<ExcluirContatoResult> result = await mediator.Send(command);
 
@@ -75,43 +58,31 @@ public class ContatoController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<SelecionarContatosResponse>> SelecionarTodos([FromQuery] SelecionarContatosRequest request)
+    public async Task<ActionResult<SelecionarContatosResponse>> SelecionarTodos([FromQuery] SelecionarContatosRequest? request)
     {
-        SelecionarContatosQuery query = new(request.Quantidade);
+        SelecionarContatosQuery query = mapper.Map<SelecionarContatosQuery>(request);
 
         Result<SelecionarContatosResult> result = await mediator.Send(query);
 
         if (result.IsFailed)
             return BadRequest();
 
-        SelecionarContatosResponse response = new(
-             result.Value.Contatos.Count,
-             result.Value.Contatos
-            );
+        SelecionarContatosResponse response = mapper.Map<SelecionarContatosResponse>(result.Value);
 
         return Ok(response);
     }
 
-
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<SelecionarContatoPorIdResponse>> SelecionarPorId(Guid id)
     {
-        SelecionarContatoPorIdQuery query = new(id);
+        SelecionarContatoPorIdQuery query = mapper.Map<SelecionarContatoPorIdQuery>(id);
 
         Result<SelecionarContatoPorIdResult> result = await mediator.Send(query);
 
         if (result.IsFailed)
             return BadRequest(result.Errors[0].Message);
 
-        SelecionarContatoPorIdResponse response = new(
-            result.Value.Id,
-            result.Value.Nome,
-            result.Value.Telefone,
-            result.Value.Email,
-            result.Value.Empresa,
-            result.Value.Cargo,
-            result.Value.Compromissos
-        );
+        SelecionarContatoPorIdResponse response = mapper.Map<SelecionarContatoPorIdResponse>(result.Value);
 
         return Ok(response);
     }
