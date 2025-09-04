@@ -1,5 +1,6 @@
 using AutoMapper;
 using eAgenda.Core.Aplicacao.ModuloContato.Commands;
+using eAgenda.Core.Dominio.ModuloCompromisso;
 using eAgenda.Core.Dominio.ModuloContato;
 using System.Collections.Immutable;
 
@@ -28,12 +29,15 @@ public class ContatoMappingProfile : Profile
                     src.Email,
                     src.Empresa,
                     src.Cargo,
-                    (src.Compromissos ?? new())
+                    (src.Compromissos ?? Enumerable.Empty<Compromisso>())
                     .Select(r => new DetalhesCompromissoContatoDto(
                             r.Assunto,
                             r.DataOcorrencia,
                             r.HoraInicio,
-                            r.HoraTermino
+                            r.HoraTermino,
+                            r.TipoCompromisso,
+                            r.Local,
+                            r.Link
                     )).ToImmutableList()
             ));
         #endregion

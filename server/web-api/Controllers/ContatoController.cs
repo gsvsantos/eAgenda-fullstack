@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace eAgenda.WebAPI.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("contatos")]
 public class ContatoController(IMediator mediator) : ControllerBase
 {
     [HttpPost("cadastrar")]

@@ -1,3 +1,4 @@
+using eAgenda.Core.Dominio.ModuloCompromisso;
 using FluentResults;
 using MediatR;
 using System.Collections.Immutable;
@@ -20,5 +21,8 @@ public record DetalhesCompromissoContatoDto(
     string Assunto,
     DateTime Data,
     TimeSpan HoraInicio,
-    TimeSpan HoraTermino
+    TimeSpan HoraTermino,
+    TipoCompromisso TipoCompromisso,
+    string Local,
+    string Link
 );
