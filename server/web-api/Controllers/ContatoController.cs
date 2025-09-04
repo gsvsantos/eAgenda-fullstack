@@ -22,7 +22,18 @@ public class ContatoController(
         Result<CadastrarContatoResult> result = await mediator.Send(command);
 
         if (result.IsFailed)
-            return BadRequest(result.Errors[0]);
+        {
+            if (result.HasError(e => e.HasMetadata("TipoErro", m => m.Equals("RequisicaoInvalida"))))
+            {
+                IEnumerable<string> errosDeValidacao = result.Errors
+                    .SelectMany(e => e.Reasons.OfType<IError>())
+                    .Select(e => e.Message);
+
+                return BadRequest(errosDeValidacao);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
 
         CadastrarContatoResponse response = mapper.Map<CadastrarContatoResponse>(result.Value);
 

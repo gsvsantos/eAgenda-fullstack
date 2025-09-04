@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,8 @@ public static class DependencyInjection
         });
 
         services.AddAutoMapper(config => config.LicenseKey = luckyPennySoftwareLicenseKey, assembly);
+
+        services.AddValidatorsFromAssembly(assembly);
 
         return services;
     }
