@@ -17,19 +17,21 @@ public static class DependencyInjection
     {
         Assembly assembly = typeof(DependencyInjection).Assembly;
 
+        string? luckyPennySoftwareLicenseKey = configuration["LUCKYPENNYSOFTWARE_LICENSE_KEY"];
+
+        if (string.IsNullOrWhiteSpace(luckyPennySoftwareLicenseKey))
+            throw new Exception("A variável LUCKYPENNYSOFTWARE_LICENSE_KEY não foi fornecida.");
+
         services.AddSerilogConfig(logging, configuration);
 
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(assembly);
+
+            config.LicenseKey = luckyPennySoftwareLicenseKey;
         });
 
-        services.AddAutoMapper(config =>
-        {
-            string? licenseKey = configuration["AUTOMAPPER_LICENSE_KEY"];
-
-            config.LicenseKey = licenseKey;
-        }, assembly);
+        services.AddAutoMapper(config => config.LicenseKey = luckyPennySoftwareLicenseKey, assembly);
 
         return services;
     }
