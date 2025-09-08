@@ -3,11 +3,13 @@ using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using eAgenda.WebAPI.Models.ModuloContato;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eAgenda.WebAPI.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("contatos")]
 public class ContatoController(
     IMapper mapper,

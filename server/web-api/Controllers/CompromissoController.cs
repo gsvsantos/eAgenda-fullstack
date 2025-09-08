@@ -3,11 +3,13 @@ using eAgenda.Core.Dominio.ModuloCompromisso;
 using eAgenda.WebAPI.Models.ModuloCompromisso;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eAgenda.WebAPI.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("compromissos")]
 public class CompromissoController(IMediator mediator, IRepositorioCompromisso repositorioCompromisso) : ControllerBase
 {

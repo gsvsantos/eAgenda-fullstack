@@ -1,7 +1,9 @@
 using eAgenda.Core.Aplicacao;
 using eAgenda.Infraestrutura.ORM;
 using eAgenda.WebAPI.AutoMapper;
+using eAgenda.WebAPI.Identity;
 using eAgenda.WebAPI.ORM;
+using eAgenda.WebAPI.Swagger;
 
 namespace eAgenda.WebAPI;
 
@@ -16,10 +18,13 @@ public class Program
             .AddCamadaInfraestruturaOrm(builder.Configuration);
 
         builder.Services.AddAutoMapperProfiles(builder.Configuration);
+
+        builder.Services.AddIdentityProviders();
+        builder.Services.AddJwtAuthentication(builder.Configuration);
+
         builder.Services.AddControllers();
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerConfig();
 
         WebApplication app = builder.Build();
 
@@ -36,6 +41,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+
+        app.UseAuthentication();
 
         app.UseAuthorization();
 

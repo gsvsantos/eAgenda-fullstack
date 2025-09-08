@@ -1,3 +1,4 @@
+
 using FluentResults;
 
 namespace eAgenda.Core.Aplicacao.Compartilhado;
@@ -29,6 +30,13 @@ public abstract class ResultadosErro
     {
         return new Error("Registro não encontrado")
             .CausedBy("Não foi possível obter o registro com o ID: " + id)
+            .WithMetadata("TipoErro", "RegistroNaoEncontrado");
+    }
+
+    public static Error RegistroNaoEncontradoErro(string registro)
+    {
+        return new Error("Registro não encontrado")
+            .CausedBy("Não foi possível obter o registro: " + registro)
             .WithMetadata("TipoErro", "RegistroNaoEncontrado");
     }
 

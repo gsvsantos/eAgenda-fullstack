@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAgenda.Core.Aplicacao", "c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAgenda.WebAPI", "web-api\eAgenda.WebAPI.csproj", "{77D4358D-8444-0A17-2423-03EBAF944D97}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04-Utils", "04-Utils", "{5BCE98BA-E2C3-4F7D-9561-2CDB96A482D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenGenerator", "TokenGenerator\TokenGenerator.csproj", "{9E8D1C53-B557-4A3E-ACA2-0EEADE826B27}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,10 @@ Global
 		{77D4358D-8444-0A17-2423-03EBAF944D97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77D4358D-8444-0A17-2423-03EBAF944D97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77D4358D-8444-0A17-2423-03EBAF944D97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E8D1C53-B557-4A3E-ACA2-0EEADE826B27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E8D1C53-B557-4A3E-ACA2-0EEADE826B27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E8D1C53-B557-4A3E-ACA2-0EEADE826B27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E8D1C53-B557-4A3E-ACA2-0EEADE826B27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +56,7 @@ Global
 		{E40DDC5F-6F81-ED8D-F21D-13A6F8B07624} = {97ECFD85-E9AC-49E1-8836-7BC3A977B6E1}
 		{04FAE5E5-5D30-1511-CDBC-997A4A6E332B} = {97ECFD85-E9AC-49E1-8836-7BC3A977B6E1}
 		{77D4358D-8444-0A17-2423-03EBAF944D97} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9E8D1C53-B557-4A3E-ACA2-0EEADE826B27} = {5BCE98BA-E2C3-4F7D-9561-2CDB96A482D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4C2AD3DA-6E6E-4CF5-9F2B-4ACB9274EFD6}
