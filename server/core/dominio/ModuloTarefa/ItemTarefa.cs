@@ -5,6 +5,7 @@ namespace eAgenda.Core.Dominio.ModuloTarefa;
 public class ItemTarefa
 {
     public Guid Id { get; set; }
+    public Guid UsuarioId { get; set; }
     public string Titulo { get; set; } = string.Empty;
     public StatusItemTarefa Status { get; set; }
     public Tarefa Tarefa { get; set; } = null!;

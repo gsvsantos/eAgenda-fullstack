@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace eAgenda.Infraestrutura.ORM.Compartilhado;
 
-public class AppDbContext(DbContextOptions options) : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
+public class AppDbContext(DbContextOptions options, ITenantProvider? tenantProvider = null) : IdentityDbContext<Usuario, Cargo, Guid>(options), IUnitOfWork
 {
     public DbSet<Contato> Contatos { get; set; }
     public DbSet<Compromisso> Compromissos { get; set; }
@@ -23,6 +23,27 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<Usuario,
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        if (tenantProvider is not null)
+        {
+            modelBuilder.Entity<Contato>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<Compromisso>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<Categoria>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<Despesa>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<Tarefa>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+
+            modelBuilder.Entity<ItemTarefa>()
+                .HasQueryFilter(x => x.UsuarioId.Equals(tenantProvider.UsuarioId));
+        }
+
         Assembly assembly = typeof(AppDbContext).Assembly;
 
         modelBuilder.ApplyConfigurationsFromAssembly(assembly);
