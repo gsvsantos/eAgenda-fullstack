@@ -2,11 +2,13 @@ using AutoMapper;
 using eAgenda.Core.Aplicacao.Compartilhado;
 using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using eAgenda.Core.Dominio.Compartilhado;
+using eAgenda.Core.Dominio.ModuloAutenticacao;
 using eAgenda.Core.Dominio.ModuloContato;
 using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
 namespace eAgenda.Core.Aplicacao.ModuloContato.Handlers;
@@ -15,6 +17,8 @@ public class CadastrarContatoCommandHandler(
     IValidator<CadastrarContatoCommand> validator,
     IMapper mapper,
     IRepositorioContato repositorioContato,
+    ITenantProvider tenantProvider,
+    IDistributedCache cache,
     IUnitOfWork unitOfWork,
     ILogger<CadastrarContatoCommandHandler> logger
 ) : IRequestHandler<CadastrarContatoCommand, Result<CadastrarContatoResult>>
@@ -22,7 +26,7 @@ public class CadastrarContatoCommandHandler(
     public async Task<Result<CadastrarContatoResult>> Handle(
         CadastrarContatoCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult resultValidation = await validator.ValidateAsync(command);
+        ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
         if (!resultValidation.IsValid)
         {
@@ -40,9 +44,16 @@ public class CadastrarContatoCommandHandler(
         {
             Contato novoContato = mapper.Map<Contato>(command);
 
+            novoContato.UsuarioId = tenantProvider.UsuarioId.GetValueOrDefault();
+
             await repositorioContato.CadastrarRegistroAsync(novoContato);
 
             await unitOfWork.CommitAsync();
+
+            // Invalida o cache
+            string cacheKey = $"contatos:u={tenantProvider.UsuarioId.GetValueOrDefault()}:q=all";
+
+            await cache.RemoveAsync(cacheKey, cancellationToken);
 
             CadastrarContatoResult result = mapper.Map<CadastrarContatoResult>(novoContato);
 
