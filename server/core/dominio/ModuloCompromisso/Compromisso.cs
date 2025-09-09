@@ -13,6 +13,7 @@ public class Compromisso : EntidadeBase<Compromisso>
     public TipoCompromisso TipoCompromisso { get; set; }
     public string Local { get; set; } = string.Empty;
     public string Link { get; set; } = string.Empty;
+    public Guid? ContatoId { get; set; }
     public Contato? Contato { get; set; }
 
     [ExcludeFromCodeCoverage]
