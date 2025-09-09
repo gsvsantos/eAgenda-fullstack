@@ -2,9 +2,11 @@ using AutoMapper;
 using eAgenda.Core.Aplicacao.Compartilhado;
 using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using eAgenda.Core.Dominio.Compartilhado;
+using eAgenda.Core.Dominio.ModuloAutenticacao;
 using eAgenda.Core.Dominio.ModuloContato;
 using FluentResults;
 using MediatR;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
 namespace eAgenda.Core.Aplicacao.ModuloContato.Handlers;
@@ -12,6 +14,8 @@ namespace eAgenda.Core.Aplicacao.ModuloContato.Handlers;
 public class EditarContatoCommandHandler(
     IMapper mapper,
     IRepositorioContato repositorioContato,
+    ITenantProvider tenantProvider,
+    IDistributedCache cache,
     IUnitOfWork unitOfWork,
     ILogger<EditarContatoCommandHandler> logger
 ) : IRequestHandler<EditarContatoCommand, Result<EditarContatoResult>>
@@ -25,19 +29,20 @@ public class EditarContatoCommandHandler(
         if (contatoSelecionado is null)
             return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(command.Id));
 
-        if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Email.Equals(command.Email))
-            && contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Telefone.Equals(command.Telefone)))
-        {
+        bool emailDuplicado = await repositorioContato.ExisteEmailAsync(
+            command.Email, contatoSelecionado.Id, cancellationToken);
+
+        bool telefoneDuplicado = await repositorioContato.ExisteTelefoneAsync(
+            command.Telefone, contatoSelecionado.Id, cancellationToken);
+
+        if (emailDuplicado && telefoneDuplicado)
             return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail e Telefone já cadastrados."));
-        }
-        else if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Email.Equals(command.Email)))
-        {
-            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail já cadastrados."));
-        }
-        else if (contatosExistestes.Any(c => !c.Id.Equals(contatoSelecionado.Id) && c.Telefone.Equals(command.Telefone)))
-        {
-            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Telefone já cadastrados."));
-        }
+
+        else if (emailDuplicado)
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail já cadastrado."));
+
+        else if (telefoneDuplicado)
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Telefone já cadastrado."));
 
         try
         {
@@ -46,6 +51,11 @@ public class EditarContatoCommandHandler(
             await repositorioContato.EditarRegistroAsync(contatoSelecionado.Id, contatoEditado);
 
             await unitOfWork.CommitAsync();
+
+            // Remove o cache de contatos do usuário
+            string cacheKey = $"contatos:u={tenantProvider.UsuarioId.GetValueOrDefault()}:q=all";
+
+            await cache.RemoveAsync(cacheKey, cancellationToken);
 
             EditarContatoResult result = mapper.Map<EditarContatoResult>(contatoEditado);
 

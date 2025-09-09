@@ -35,10 +35,20 @@ public class CadastrarContatoCommandHandler(
             return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
         }
 
-        List<Contato> registros = await repositorioContato.SelecionarRegistrosAsync();
+        List<Contato> contatosExistestes = await repositorioContato.SelecionarRegistrosAsync();
 
-        if (registros.Any(i => i.Nome.Equals(command.Nome)))
-            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe um contato registrado com este nome."));
+        bool emailDuplicado = await repositorioContato.ExisteEmailAsync(command.Email, cancellationToken);
+
+        bool telefoneDuplicado = await repositorioContato.ExisteTelefoneAsync(command.Telefone, cancellationToken);
+
+        if (emailDuplicado && telefoneDuplicado)
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail e Telefone já cadastrados."));
+
+        else if (emailDuplicado)
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("E-mail já cadastrado."));
+
+        else if (telefoneDuplicado)
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Telefone já cadastrado."));
 
         try
         {
@@ -50,7 +60,7 @@ public class CadastrarContatoCommandHandler(
 
             await unitOfWork.CommitAsync();
 
-            // Invalida o cache
+            // Remove o cache de contatos do usuário
             string cacheKey = $"contatos:u={tenantProvider.UsuarioId.GetValueOrDefault()}:q=all";
 
             await cache.RemoveAsync(cacheKey, cancellationToken);
