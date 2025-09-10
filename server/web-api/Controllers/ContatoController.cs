@@ -25,7 +25,7 @@ public class ContatoController(
 
         if (result.IsFailed)
         {
-            if (result.HasError(e => e.HasMetadata("TipoErro", m => m.Equals("RequisicaoInvalida"))))
+            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
             {
                 IEnumerable<string> errosDeValidacao = result.Errors
                     .SelectMany(e => e.Reasons.OfType<IError>())
@@ -50,7 +50,18 @@ public class ContatoController(
         Result<EditarContatoResult> result = await mediator.Send(command);
 
         if (result.IsFailed)
-            return BadRequest(result.Errors[0]);
+        {
+            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
+            {
+                IEnumerable<string> errosDeValidacao = result.Errors
+                    .SelectMany(e => e.Reasons.OfType<IError>())
+                    .Select(e => e.Message);
+
+                return BadRequest(errosDeValidacao);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
 
         EditarContatoResponse response = mapper.Map<EditarContatoResponse>(result.Value);
 
@@ -65,7 +76,18 @@ public class ContatoController(
         Result<ExcluirContatoResult> result = await mediator.Send(command);
 
         if (result.IsFailed)
-            return BadRequest(result.Errors[0]);
+        {
+            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
+            {
+                IEnumerable<string> errosDeValidacao = result.Errors
+                    .SelectMany(e => e.Reasons.OfType<IError>())
+                    .Select(e => e.Message);
+
+                return BadRequest(errosDeValidacao);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
 
         return NoContent();
     }
@@ -79,7 +101,18 @@ public class ContatoController(
         Result<SelecionarContatosResult> result = await mediator.Send(query, cancellationToken);
 
         if (result.IsFailed)
-            return BadRequest();
+        {
+            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
+            {
+                IEnumerable<string> errosDeValidacao = result.Errors
+                    .SelectMany(e => e.Reasons.OfType<IError>())
+                    .Select(e => e.Message);
+
+                return BadRequest(errosDeValidacao);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
 
         SelecionarContatosResponse response = mapper.Map<SelecionarContatosResponse>(result.Value);
 
@@ -94,7 +127,18 @@ public class ContatoController(
         Result<SelecionarContatoPorIdResult> result = await mediator.Send(query);
 
         if (result.IsFailed)
-            return BadRequest(result.Errors[0].Message);
+        {
+            if (result.HasError(e => e.HasMetadataKey("TipoErro")))
+            {
+                IEnumerable<string> errosDeValidacao = result.Errors
+                    .SelectMany(e => e.Reasons.OfType<IError>())
+                    .Select(e => e.Message);
+
+                return BadRequest(errosDeValidacao);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
 
         SelecionarContatoPorIdResponse response = mapper.Map<SelecionarContatoPorIdResponse>(result.Value);
 
