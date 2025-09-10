@@ -1,19 +1,19 @@
 services:
   eagenda.webapi:
     image: ${DOCKER_REGISTRY-}eagendawebapi
+    container_name: eagenda.webapi
     build:
       context: .
       dockerfile: web-api/Dockerfile
-    container_name: eagenda.webapi
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
-      cache:
+      redis:
         condition: service_healthy
     networks:
       - eagenda-net
 
-  db:
+  postgres:
     image: postgres:16
     container_name: eagenda.db
     restart: unless-stopped
@@ -25,7 +25,7 @@ services:
     networks:
       - eagenda-net
 
-  cache:
+  redis:
     image: redis:8.2.1
     container_name: eagenda.redis
     command: >
