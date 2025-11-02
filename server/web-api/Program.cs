@@ -4,6 +4,7 @@ using eAgenda.WebAPI.AutoMapper;
 using eAgenda.WebAPI.Identity;
 using eAgenda.WebAPI.ORM;
 using eAgenda.WebAPI.Swagger;
+using System.Text.Json.Serialization;
 
 namespace eAgenda.WebAPI;
 
@@ -22,7 +23,9 @@ public class Program
         builder.Services.AddIdentityProviders();
         builder.Services.AddJwtAuthentication(builder.Configuration);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
         builder.Services.AddSwaggerConfig();
 

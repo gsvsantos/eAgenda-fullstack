@@ -1,8 +1,10 @@
 using AutoMapper;
 using eAgenda.Core.Aplicacao.ModuloCompromisso.Commands;
 using eAgenda.Core.Dominio.ModuloCompromisso;
+using System.Collections.Immutable;
 
 namespace eAgenda.Core.Aplicacao.AutoMapper;
+
 public class CompromissoMappingProfile : Profile
 {
     public CompromissoMappingProfile()
@@ -10,6 +12,49 @@ public class CompromissoMappingProfile : Profile
         #region Cadastrar
         CreateMap<CadastrarCompromissoCommand, Compromisso>();
         CreateMap<Compromisso, CadastrarCompromissoResult>();
+        #endregion
+
+        #region Edição
+        CreateMap<EditarCompromissoCommand, Compromisso>();
+        CreateMap<Compromisso, EditarCompromissoResult>();
+        #endregion
+
+        #region SeleçãoPorId
+        CreateMap<Compromisso, SelecionarCompromissoPorIdResult>()
+            .ConvertUsing(src => new SelecionarCompromissoPorIdResult(
+                src.Id,
+                src.Assunto,
+                src.DataOcorrencia,
+                src.HoraInicio,
+                src.HoraTermino,
+                src.TipoCompromisso,
+                src.Local,
+                src.Link,
+                src.Contato!.Nome
+            ));
+        #endregion
+
+        #region SeleçãoTodos
+        CreateMap<Compromisso, SelecionarCompromissosDto>()
+           .ConvertUsing(src => new SelecionarCompromissosDto(
+                src.Id,
+                src.Assunto,
+                src.DataOcorrencia,
+                src.HoraInicio,
+                src.HoraTermino,
+                src.TipoCompromisso,
+                src.Local,
+                src.Link,
+                src.Contato!.Nome
+            ));
+
+        CreateMap<IEnumerable<Compromisso>, SelecionarCompromissosResult>()
+         .ConvertUsing((src, dest, ctx) =>
+             new SelecionarCompromissosResult(
+                 src?.Select(c => ctx.Mapper.Map<SelecionarCompromissosDto>(c)).ToImmutableList() ??
+                 ImmutableList<SelecionarCompromissosDto>.Empty
+             )
+         );
         #endregion
     }
 }

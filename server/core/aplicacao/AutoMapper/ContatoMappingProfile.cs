@@ -44,7 +44,6 @@ public class ContatoMappingProfile : Profile
 
         #region SeleçãoTodos
         CreateMap<Contato, SelecionarContatosDto>();
-
         CreateMap<IEnumerable<Contato>, SelecionarContatosResult>()
             .ConvertUsing((src, dest, ctx) =>
                 new SelecionarContatosResult(

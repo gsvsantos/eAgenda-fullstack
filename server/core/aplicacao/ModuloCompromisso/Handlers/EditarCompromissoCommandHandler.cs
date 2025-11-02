@@ -14,19 +14,19 @@ using Microsoft.Extensions.Logging;
 
 namespace eAgenda.Core.Aplicacao.ModuloCompromisso.Handlers;
 
-public class CadastrarCompromissoCommandHandler(
-    IValidator<CadastrarCompromissoCommand> validator,
+public class EditarCompromissoCommandHandler(
+    IValidator<EditarCompromissoCommand> validator,
     IMapper mapper,
     IRepositorioCompromisso repositorioCompromisso,
     IRepositorioContato repositorioContato,
     ITenantProvider tenantProvider,
     IDistributedCache cache,
     IUnitOfWork unitOfWork,
-    ILogger<CadastrarCompromissoCommandHandler> logger
-) : IRequestHandler<CadastrarCompromissoCommand, Result<CadastrarCompromissoResult>>
+    ILogger<EditarCompromissoCommandHandler> logger
+) : IRequestHandler<EditarCompromissoCommand, Result<EditarCompromissoResult>>
 {
-    public async Task<Result<CadastrarCompromissoResult>> Handle(
-        CadastrarCompromissoCommand command, CancellationToken cancellationToken)
+    public async Task<Result<EditarCompromissoResult>> Handle(
+        EditarCompromissoCommand command, CancellationToken cancellationToken)
     {
         ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
 
@@ -72,7 +72,7 @@ public class CadastrarCompromissoCommandHandler(
 
             await cache.RemoveAsync(cacheKey, cancellationToken);
 
-            CadastrarCompromissoResult result = mapper.Map<CadastrarCompromissoResult>(novoCompromisso);
+            EditarCompromissoResult result = mapper.Map<EditarCompromissoResult>(novoCompromisso);
 
             return Result.Ok(result);
         }
@@ -90,9 +90,10 @@ public class CadastrarCompromissoCommandHandler(
         }
     }
 
-    private static bool ContemConflito(CadastrarCompromissoCommand command, List<Compromisso> compromissosExistentes)
+    private static bool ContemConflito(EditarCompromissoCommand command, List<Compromisso> compromissosExistentes)
     {
         return compromissosExistentes.Any(c =>
+                    !c.Id.Equals(command.Id) &&
                     c.DataOcorrencia.Equals(command.DataOcorrencia) &&
                         (
                             (command.HoraInicio >= c.HoraInicio && command.HoraInicio < c.HoraInicio) ||

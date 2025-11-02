@@ -2,10 +2,11 @@ using eAgenda.Core.Aplicacao.ModuloContato.Commands;
 using FluentValidation;
 using System.Text.RegularExpressions;
 
-namespace eAgenda.Core.Aplicacao.FluentValidation;
-public class CadastrarContatoCommandValidator : AbstractValidator<CadastrarContatoCommand>
+namespace eAgenda.Core.Aplicacao.FluentValidation.ModuloContato;
+
+public class EditarContatoCommandValidator : AbstractValidator<EditarContatoCommand>
 {
-    public CadastrarContatoCommandValidator()
+    public EditarContatoCommandValidator()
     {
         RuleFor(c => c.Nome)
             .NotEmpty().WithMessage("Insira um Nome.")

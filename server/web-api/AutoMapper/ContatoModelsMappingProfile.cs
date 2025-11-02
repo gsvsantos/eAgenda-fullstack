@@ -9,9 +9,12 @@ public class ContatoModelsMappingProfile : Profile
 {
     public ContatoModelsMappingProfile()
     {
+        #region Cadastrar
         CreateMap<CadastrarContatoRequest, CadastrarContatoCommand>();
         CreateMap<CadastrarContatoResult, CadastrarContatoResponse>();
+        #endregion
 
+        #region Edição
         CreateMap<(Guid, EditarContatoRequest), EditarContatoCommand>()
             .ConvertUsing(src => new EditarContatoCommand(
                 src.Item1,
@@ -22,20 +25,14 @@ public class ContatoModelsMappingProfile : Profile
                 src.Item2.Cargo
             ));
         CreateMap<EditarContatoResult, EditarContatoResponse>();
+        #endregion
 
+        #region Excluir
         CreateMap<Guid, ExcluirContatoCommand>()
             .ConstructUsing(src => new ExcluirContatoCommand(src));
+        #endregion
 
-        CreateMap<SelecionarContatosRequest, SelecionarContatosQuery>();
-        CreateMap<SelecionarContatosResult, SelecionarContatosResponse>()
-            .ConvertUsing((src, dest, ctx) =>
-                new SelecionarContatosResponse(
-                    src?.Contatos.Count,
-                    src?.Contatos.Select(c => ctx.Mapper.Map<SelecionarContatosDto>(c)).ToImmutableList() ??
-                        ImmutableList<SelecionarContatosDto>.Empty
-                )
-            );
-
+        #region SeleçãoPorId
         CreateMap<Guid, SelecionarContatoPorIdQuery>()
             .ConstructUsing(src => new SelecionarContatoPorIdQuery(src));
         CreateMap<SelecionarContatoPorIdResult, SelecionarContatoPorIdResponse>()
@@ -57,5 +54,18 @@ public class ContatoModelsMappingProfile : Profile
                             r.Link
                     )).ToImmutableList()
             ));
+        #endregion
+
+        #region SeleçãoTodos
+        CreateMap<SelecionarContatosRequest, SelecionarContatosQuery>();
+        CreateMap<SelecionarContatosResult, SelecionarContatosResponse>()
+            .ConvertUsing((src, dest, ctx) =>
+                new SelecionarContatosResponse(
+                    src?.Contatos.Count,
+                    src?.Contatos.Select(c => ctx.Mapper.Map<SelecionarContatosDto>(c)).ToImmutableList() ??
+                        ImmutableList<SelecionarContatosDto>.Empty
+                )
+            );
+        #endregion
     }
 }

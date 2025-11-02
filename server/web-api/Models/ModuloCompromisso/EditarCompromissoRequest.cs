@@ -2,7 +2,7 @@ using eAgenda.Core.Dominio.ModuloCompromisso;
 
 namespace eAgenda.WebAPI.Models.ModuloCompromisso;
 
-public record CadastrarCompromissoRequest(
+public record EditarCompromissoRequest(
     string Assunto,
     DateTime DataOcorrencia,
     TimeSpan HoraInicio,
@@ -13,4 +13,13 @@ public record CadastrarCompromissoRequest(
     Guid? ContatoId = null
 );
 
-public record CadastrarCompromissoResponse(Guid Id);
+public record EditarCompromissoResponse(
+    string Assunto,
+    DateTime DataOcorrencia,
+    TimeSpan HoraInicio,
+    TimeSpan HoraTermino,
+    TipoCompromisso TipoCompromisso,
+    string? Local,
+    string? Link,
+    string? Contato
+);

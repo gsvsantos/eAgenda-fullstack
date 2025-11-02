@@ -5,6 +5,8 @@ using eAgenda.Core.Dominio.Compartilhado;
 using eAgenda.Core.Dominio.ModuloAutenticacao;
 using eAgenda.Core.Dominio.ModuloContato;
 using FluentResults;
+using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace eAgenda.Core.Aplicacao.ModuloContato.Handlers;
 
 public class EditarContatoCommandHandler(
+    IValidator<EditarContatoCommand> validator,
     IMapper mapper,
     IRepositorioContato repositorioContato,
     ITenantProvider tenantProvider,
@@ -23,6 +26,15 @@ public class EditarContatoCommandHandler(
     public async Task<Result<EditarContatoResult>> Handle(
         EditarContatoCommand command, CancellationToken cancellationToken)
     {
+        ValidationResult resultValidation = await validator.ValidateAsync(command, cancellationToken);
+
+        if (!resultValidation.IsValid)
+        {
+            IEnumerable<string> erros = resultValidation.Errors.Select(e => e.ErrorMessage);
+
+            return Result.Fail(ResultadosErro.RequisicaoInvalidaErro(erros));
+        }
+
         List<Contato> contatosExistestes = await repositorioContato.SelecionarRegistrosAsync();
         Contato? contatoSelecionado = await repositorioContato.SelecionarRegistroPorIdAsync(command.Id);
 

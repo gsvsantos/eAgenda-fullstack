@@ -4,7 +4,8 @@ using MediatR;
 
 namespace eAgenda.Core.Aplicacao.ModuloCompromisso.Commands;
 
-public record CadastrarCompromissoCommand(
+public record EditarCompromissoCommand(
+    Guid Id,
     string Assunto,
     DateTime DataOcorrencia,
     TimeSpan HoraInicio,
@@ -13,6 +14,15 @@ public record CadastrarCompromissoCommand(
     string? Local,
     string? Link,
     Guid? ContatoId = null
-) : IRequest<Result<CadastrarCompromissoResult>>;
+) : IRequest<Result<EditarCompromissoResult>>;
 
-public record CadastrarCompromissoResult(Guid Id);
+public record EditarCompromissoResult(
+    string Assunto,
+    DateTime DataOcorrencia,
+    TimeSpan HoraInicio,
+    TimeSpan HoraTermino,
+    TipoCompromisso TipoCompromisso,
+    string? Local,
+    string? Link,
+    string? Contato
+);

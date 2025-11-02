@@ -1,4 +1,3 @@
-
 using FluentResults;
 
 namespace eAgenda.Core.Aplicacao.Compartilhado;
